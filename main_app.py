@@ -88,6 +88,32 @@ def main():
             ["📊 Dashboard", "📥 Data Ingestion", "🔍 Knowledge Exploration", 
              "🎯 Attack Path Analysis", "🤖 RAG Query Interface", "📈 3D Visualization"]
         )
+
+        # Inject Tooltips into the radio buttons via JS
+        tooltip_script = """
+        <script>
+        const tooltips = {
+            "📊 Dashboard": "Overview of graph metrics, nodes, and active relationships.",
+            "📥 Data Ingestion": "Autonomous pipeline for MITRE STIX, Custom PDFs, and Multi-language YouTube parsing.",
+            "🔍 Knowledge Exploration": "Raw semantic table view of database relationships.",
+            "🎯 Attack Path Analysis": "Neo4j Dijkstra's algorithm calculating shortest breach paths to critical assets.",
+            "🤖 RAG Query Interface": "Hybrid Vector+Graph reasoning chat powered by local Llama3.",
+            "📈 3D Visualization": "H/W Accelerated force-directed graph with volumetric bloom and live LLM extraction traces."
+        };
+        
+        // Wait for Streamlit to render the radio buttons, then inject data attributes
+        setTimeout(() => {
+            const labels = window.parent.document.querySelectorAll('div[data-testid="stSidebar"] div[role="radiogroup"] label');
+            labels.forEach(label => {
+                const text = label.innerText;
+                if(tooltips[text]) {
+                    label.setAttribute('data-tooltip', tooltips[text]);
+                }
+            });
+        }, 1500);
+        </script>
+        """
+        st.components.v1.html(tooltip_script, height=0, width=0)
         
         st.divider()
         

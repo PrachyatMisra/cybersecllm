@@ -37,6 +37,74 @@
         transform: translateY(-2px);
     }
 
+    /* Sidebar Navigation Hover Animations & Explanations */
+    div[data-testid="stSidebarNavItems"]>li>a {
+        position: relative;
+        overflow: visible !important;
+        transition: all 0.3s ease-in-out;
+    }
+
+    div[data-testid="stSidebarNavItems"]>li>a:hover {
+        background-color: rgba(59, 130, 246, 0.15) !important;
+        transform: translateX(5px);
+        border-left: 3px solid #3b82f6;
+    }
+
+    /* Secret Tooltips for Radio buttons (Streamlit standard nav) */
+    .stRadio {
+        position: relative;
+    }
+
+    .stRadio>div[role="radiogroup"]>label {
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 5px;
+    }
+
+    .stRadio>div[role="radiogroup"]>label:hover {
+        background: rgba(59, 130, 246, 0.1) !important;
+        transform: scale(1.02) translateX(3px);
+        border-right: 2px solid #3b82f6;
+    }
+
+    /* Custom Data Attribute Tooltips */
+    .stRadio>div[role="radiogroup"]>label:hover::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        left: 105%;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(11, 15, 25, 0.95);
+        border: 1px solid #3b82f6;
+        padding: 8px 12px;
+        border-radius: 6px;
+        color: #93c5fd;
+        font-size: 0.75rem;
+        font-family: monospace;
+        width: 250px;
+        white-space: normal;
+        z-index: 9999;
+        box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+        pointer-events: none;
+        opacity: 0;
+        animation: tooltipFadeIn 0.3s forwards 0.2s;
+        /* Delayed fade in */
+    }
+
+    @keyframes tooltipFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-50%) translateX(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(-50%) translateX(0);
+        }
+    }
+
     /* Headers */
     h1,
     h2,
