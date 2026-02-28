@@ -122,6 +122,84 @@
         z-index: -1 !important;
         pointer-events: none !important;
     }
+
+    /* --- 2026 Game-like Extreme UI Enhancements --- */
+
+    /* 1. Neon Pulse on Streamlit Cards/Containers */
+    div[data-testid="stVerticalBlock"]>div>div {
+        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+    }
+
+    div[data-testid="stVerticalBlock"]>div>div:hover {
+        transform: translateY(-2px) scale(1.005);
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.15) !important;
+        border-radius: 8px;
+    }
+
+    /* 2. Streamlit Inputs (Text areas, selects) */
+    div.stTextInput>div>div>input,
+    div.stSelectbox>div>div>div {
+        background: rgba(15, 23, 42, 0.8) !important;
+        border: 1px solid rgba(59, 130, 246, 0.3) !important;
+        color: #60A5FA !important;
+        transition: all 0.3s ease !important;
+    }
+
+    div.stTextInput>div>div>input:focus,
+    div.stSelectbox>div>div>div:focus-within {
+        border-color: #3B82F6 !important;
+        box-shadow: 0 0 15px rgba(59, 130, 246, 0.6), inset 0 0 10px rgba(59, 130, 246, 0.2) !important;
+        transform: scale(1.02);
+    }
+
+    /* 3. Streamlit Tabs Styling */
+    button[data-baseweb="tab"] {
+        background: transparent !important;
+        border: none !important;
+        border-bottom: 2px solid transparent !important;
+        color: #9CA3AF !important;
+        transition: all 0.3s ease;
+        padding-bottom: 15px !important;
+    }
+
+    button[data-baseweb="tab"][aria-selected="true"] {
+        color: #60A5FA !important;
+        border-bottom: 2px solid #3B82F6 !important;
+        text-shadow: 0 0 12px rgba(96, 165, 250, 0.8);
+        animation: neonGlow 2s infinite alternate;
+    }
+
+    button[data-baseweb="tab"]:hover {
+        color: #E2E8F0 !important;
+        text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+    }
+
+    /* 4. Metric Number Glow */
+    div[data-testid="stMetricValue"] {
+        font-weight: 800;
+        letter-spacing: 2px;
+        animation: subtlePulse 4s infinite alternate;
+    }
+
+    @keyframes neonGlow {
+        from {
+            text-shadow: 0 0 5px rgba(59, 130, 246, 0.5), 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+
+        to {
+            text-shadow: 0 0 20px rgba(59, 130, 246, 1), 0 0 30px rgba(59, 130, 246, 0.8);
+        }
+    }
+
+    @keyframes subtlePulse {
+        from {
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+        }
+
+        to {
+            text-shadow: 0 0 20px rgba(59, 130, 246, 0.9);
+        }
+    }
 </style>
 
 <div id="tsparticles"></div>

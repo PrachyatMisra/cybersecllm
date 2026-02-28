@@ -85,20 +85,19 @@ def main():
         
         page = st.radio(
             "Navigation",
-            ["📊 Dashboard", "📥 Data Ingestion", "🔍 Knowledge Exploration", 
-             "🎯 Attack Path Analysis", "🤖 RAG Query Interface", "📈 3D Visualization"]
+            ["🌐 3D Live Dashboard", "📥 Data Ingestion", "🔍 Knowledge Explorer", 
+             "🎯 Attack Path Analysis", "🤖 Omni-RAG Intelligence"]
         )
 
-        # Inject Tooltips into the radio buttons via JS
+        # Inject Tooltips into the radio buttons via JS for Game-like Hover Explanations
         tooltip_script = """
         <script>
         const tooltips = {
-            "📊 Dashboard": "Overview of graph metrics, nodes, and active relationships.",
+            "🌐 3D Live Dashboard": "Immediate H/W Accelerated 3D node exploration with volumetric bloom and live metrics.",
             "📥 Data Ingestion": "Autonomous pipeline for MITRE STIX, Custom PDFs, and Multi-language YouTube parsing.",
-            "🔍 Knowledge Exploration": "Raw semantic table view of database relationships.",
+            "🔍 Knowledge Explorer": "Raw semantic table view of database relationships.",
             "🎯 Attack Path Analysis": "Neo4j Dijkstra's algorithm calculating shortest breach paths to critical assets.",
-            "🤖 RAG Query Interface": "Hybrid Vector+Graph reasoning chat powered by local Llama3.",
-            "📈 3D Visualization": "H/W Accelerated force-directed graph with volumetric bloom and live LLM extraction traces."
+            "🤖 Omni-RAG Intelligence": "Hybrid Vector+Graph reasoning chat powered by local Llama3."
         };
         
         // Wait for Streamlit to render the radio buttons, then inject data attributes
@@ -127,18 +126,16 @@ def main():
                 pass
     
     # Main Content Area
-    if page == "📊 Dashboard":
+    if page == "🌐 3D Live Dashboard":
         show_dashboard()
     elif page == "📥 Data Ingestion":
         show_ingestion()
-    elif page == "🔍 Knowledge Exploration":
+    elif page == "🔍 Knowledge Explorer":
         show_exploration()
     elif page == "🎯 Attack Path Analysis":
         show_attack_paths()
-    elif page == "🤖 RAG Query Interface":
+    elif page == "🤖 Omni-RAG Intelligence":
         show_rag_interface()
-    elif page == "📈 3D Visualization":
-        show_3d_viz()
 
 def show_dashboard():
     """Main dashboard view"""
@@ -151,65 +148,53 @@ def show_dashboard():
     # Get comprehensive stats
     stats = st.session_state.neo4j_handler.get_graph_stats()
     
-    # Metrics Row
-    col1, col2, col3, col4 = st.columns(4)
+    st.markdown("""
+        <style>
+        .hud-metrics {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
+    with st.container():
+        st.markdown('<div class="hud-metrics">', unsafe_allow_html=True)
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            st.metric("Total Nodes", f"{stats.get('node_count', 0):,}")
+        with col2:
+            st.metric("Relationships", f"{stats.get('relationship_count', 0):,}")
+        with col3:
+            st.metric("Node Types", len(stats.get('node_types', {})))
+        with col4:
+            st.metric("Relation Types", len(stats.get('relationship_types', {})))
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    st.markdown("### 🛰️ Live Threat Visualizer")
     
-    with col1:
-        st.metric(
-            "Total Nodes",
-            f"{stats.get('node_count', 0):,}",
-            delta=None
-        )
-    
-    with col2:
-        st.metric(
-            "Relationships",
-            f"{stats.get('relationship_count', 0):,}",
-            delta=None
-        )
-    
-    with col3:
-        st.metric(
-            "Node Types",
-            len(stats.get('node_types', {}))
-        )
-    
-    with col4:
-        st.metric(
-            "Relation Types",
-            len(stats.get('relationship_types', {}))
-        )
-    
-    # Node Type Distribution
-    st.subheader("Node Type Distribution")
-    node_types = stats.get('node_types', {})
-    
-    if node_types:
-        fig = go.Figure(data=[go.Bar(
-            x=list(node_types.keys()),
-            y=list(node_types.values()),
-            marker_color='#E74C3C'
-        )])
-        fig.update_layout(
-            title="Nodes by Type",
-            xaxis_title="Node Type",
-            yaxis_title="Count",
-            height=400
-        )
-        st.plotly_chart(fig, use_container_width=True)
-    
-    # Handler Performance Stats
-    st.subheader("Handler Performance")
-    handler_stats = stats.get('handler_stats', {})
-    
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric("Queries Executed", handler_stats.get('queries_executed', 0))
-    with col2:
-        st.metric("Failed Queries", handler_stats.get('queries_failed', 0))
-    with col3:
-        avg_time = handler_stats.get('total_query_time', 0) / max(handler_stats.get('queries_executed', 1), 1)
-        st.metric("Avg Query Time", f"{avg_time:.3f}s")
+    with st.spinner("Initializing CyberGraph Analytics Engine..."):
+        try:
+            # Force high-limit extraction for the main dashboard background
+            graph_data = st.session_state.neo4j_handler.export_for_3d_visualization(limit=800)
+            
+            with open("advanced_gui.html", "r", encoding="utf-8") as f:
+                html_content = f.read()
+
+            html_content = html_content.replace(
+                "const graphData = {};",
+                f"const graphData = {json.dumps(graph_data)};"
+            )
+            
+            components.html(html_content, height=750, scrolling=False)
+            
+        except Exception as e:
+            st.error(f"Failed to load 3D visualization: {e}")
 
 def show_ingestion():
     """Data ingestion interface"""
