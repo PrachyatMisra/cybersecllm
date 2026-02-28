@@ -72,8 +72,8 @@ def init_connections():
         return False
 
 def main():
-    st.title("🛡️ Cybersecurity Knowledge Graph Intelligence System")
-    st.markdown("**LLM-Powered IDS & Threat Intelligence Platform**")
+    st.markdown("<h1 style='text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 15px rgba(59,130,246,0.6);'>🛡️ CYBERGRAPH_OS // INTELLIGENCE SYSTEM</h1>", unsafe_allow_html=True)
+    st.markdown("**[SYSTEM ONLINE] LLM-Powered Threat Hunting Platform**")
     
     # Sidebar Navigation
     with st.sidebar:

@@ -1,15 +1,34 @@
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&display=swap');
+
     /* CSS to reset background and let particles show through */
     .stApp {
-        background-color: #0B0F19 !important;
+        background-color: #05050A !important;
         color: #E2E8F0 !important;
+        font-family: 'Orbitron', 'Inter', sans-serif !important;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    .stMarkdown,
+    p,
+    span,
+    div,
+    label {
+        font-family: 'Orbitron', 'Inter', sans-serif !important;
+        letter-spacing: 0.5px;
     }
 
     /* Glassmorphism for Streamlit panels */
     div[data-testid="stSidebar"] {
-        background: rgba(17, 24, 39, 0.7) !important;
-        backdrop-filter: blur(12px) !important;
-        border-right: 1px solid rgba(59, 130, 246, 0.2) !important;
+        background: rgba(8, 12, 20, 0.8) !important;
+        backdrop-filter: blur(16px) !important;
+        border-right: 1px solid rgba(59, 130, 246, 0.3) !important;
+        box-shadow: 5px 0 25px rgba(0, 0, 0, 0.5);
     }
 
     div[data-testid="stMetricValue"] {
@@ -24,17 +43,22 @@
     }
 
     .stButton>button {
-        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%) !important;
-        border: 1px solid #60a5fa !important;
-        color: white !important;
+        background: linear-gradient(135deg, rgba(30, 58, 138, 0.8) 0%, rgba(59, 130, 246, 0.8) 100%) !important;
+        border: 1px solid #3B82F6 !important;
+        color: #E0F2FE !important;
         box-shadow: 0 0 15px rgba(59, 130, 246, 0.4) !important;
-        transition: all 0.3s ease !important;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+        backdrop-filter: blur(5px);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-weight: 700;
     }
 
     .stButton>button:hover {
-        box-shadow: 0 0 25px rgba(59, 130, 246, 0.7) !important;
-        border-color: #93c5fd !important;
-        transform: translateY(-2px);
+        box-shadow: 0 0 30px rgba(59, 130, 246, 0.9) !important;
+        border-color: #93C5FD !important;
+        transform: translateY(-3px) scale(1.02);
+        color: #FFFFFF !important;
     }
 
     /* Sidebar Navigation Hover Animations & Explanations */
@@ -200,8 +224,27 @@
             text-shadow: 0 0 20px rgba(59, 130, 246, 0.9);
         }
     }
+
+    /* Global Streamlit Scanlines */
+    .global-scanlines {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: linear-gradient(to bottom,
+                rgba(255, 255, 255, 0),
+                rgba(255, 255, 255, 0) 50%,
+                rgba(0, 0, 0, 0.15) 50%,
+                rgba(0, 0, 0, 0.15));
+        background-size: 100% 4px;
+        pointer-events: none;
+        z-index: 999999;
+        opacity: 0.7;
+    }
 </style>
 
+<div class="global-scanlines"></div>
 <div id="tsparticles"></div>
 <script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
 <script>

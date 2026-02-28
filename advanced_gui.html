@@ -150,10 +150,59 @@
             color: #D1D5DB;
             border: 1px solid rgba(156, 163, 175, 0.4);
         }
+
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+        .cyber-font {
+            font-family: 'Orbitron', 'Inter', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        /* Post-Processing Cyber Scanlines */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(to bottom,
+                    rgba(255, 255, 255, 0),
+                    rgba(255, 255, 255, 0) 50%,
+                    rgba(0, 0, 0, 0.2) 50%,
+                    rgba(0, 0, 0, 0.2));
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0.6;
+        }
+
+        /* Subtle screen flicker */
+        @keyframes flicker {
+            0% {
+                opacity: 0.95;
+            }
+
+            5% {
+                opacity: 0.85;
+            }
+
+            10% {
+                opacity: 0.95;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        body {
+            animation: flicker 0.15s infinite;
+        }
     </style>
 </head>
 
 <body>
+    <div class="scanlines"></div>
 
     <div id="graph-container"></div>
 
@@ -253,12 +302,14 @@
                     <span id="insp-badge" class="badge badge-technique">Technique</span>
                     <button id="close-inspector" class="text-gray-400 hover:text-white">✕</button>
                 </div>
-                <h2 id="insp-title" class="text-xl font-bold mb-1 text-white leading-tight">Phishing: Spearphishing Link
+                <h2 id="insp-title" class="text-xl font-bold mb-1 text-white leading-tight">Phishing: Spearphishing
+                    Link
                 </h2>
                 <div id="insp-id" class="text-xs text-cyber-accent font-mono mb-4">T1566.002</div>
 
                 <p id="insp-desc" class="text-sm text-gray-300 leading-relaxed mb-4 max-h-48 overflow-y-auto">
-                    Adversaries may send spearphishing emails with a malicious link in an attempt to gather information
+                    Adversaries may send spearphishing emails with a malicious link in an attempt to gather
+                    information
                     or gain access to victim systems.
                 </p>
 
@@ -289,20 +340,27 @@
 
         const getBadgeClass = (label) => typeConfig[label]?.class || "badge-default";
 
-        // Dynamic vibrant color generator for undefined types
+        // Dynamic vibrant color generator for undefined types or UNKNOWN
         const generatedColors = {};
         function hashCode(str) {
             let hash = 0;
+            if (!str) return hash;
             for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
             return hash;
         }
-        function getColorForLabel(label) {
+        function getColorForLabel(node) {
+            const label = node.label;
             if (!label) return '#9CA3AF';
-            if (typeConfig[label]) return typeConfig[label].color;
-            if (generatedColors[label]) return generatedColors[label];
-            const hue = Math.abs(hashCode(label)) % 360;
-            const color = `hsl(${hue}, 90%, 65%)`;
-            generatedColors[label] = color;
+            if (typeConfig[label] && label !== 'UNKNOWN') return typeConfig[label].color;
+
+            // For UNKNOWN or massive homogeneous structures, hash the actual node ID to generate a vibrant cyberpunk palette
+            const uniqueStr = node.id || label;
+            if (generatedColors[uniqueStr]) return generatedColors[uniqueStr];
+
+            const hue = Math.abs(hashCode(uniqueStr)) % 360;
+            // High saturation, bright colors (Cyberpunk aesthetic)
+            const color = `hsl(${hue}, 100%, 65%)`;
+            generatedColors[uniqueStr] = color;
             return color;
         }
 
@@ -335,21 +393,22 @@
             Graph = ForceGraph3D()
                 (document.getElementById('graph-container'))
                 .graphData(gData)
-                .nodeLabel(node => `<div class="bg-gray-900 border border-gray-700 p-2 rounded text-sm"><span class="${getBadgeClass(node.label)} mb-1">${node.label}</span><br><b>${node.name}</b></div>`)
-                .nodeColor(node => getColorForLabel(node.label))
-                .nodeRelSize(7)
-                .nodeResolution(24) // Reduced from 32 for FPS
+                .nodeLabel(node => `<div class="bg-gray-900 border border-gray-700 p-2 rounded text-sm"><span class="${getBadgeClass(node.label)} mb-1">${node.label}</span><br><b class="cyber-font text-white tracking-widest">${node.name}</b></div>`)
+                .nodeColor(node => getColorForLabel(node))
+                .nodeRelSize(5) // Slightly smaller for dense graphs
+                .nodeResolution(8) // MASSIVE performance optimization! 8 res is enough
+                .enableNodeDrag(false) // Saves physics raycasting overhead on 20k nodes
                 .linkColor(link => {
                     const src = typeof link.source === 'object' ? link.source : gData.nodes.find(n => n.id === link.source);
-                    return src ? getColorForLabel(src.label) : '#ffffff';
+                    return src ? getColorForLabel(src) : '#ffffff';
                 })
-                .linkWidth(1)
-                .linkOpacity(0.3)
+                // REMOVE linkWidth to force 1px WebGL line primitives instead of heavy cylinder geometry
+                .linkOpacity(0.15) // Lower opacity for 20k dense clusters
                 .linkDirectionalParticles(particleCount)
-                .linkDirectionalParticleWidth(2.0)
+                .linkDirectionalParticleWidth(1.5)
                 .linkDirectionalParticleColor(link => {
                     const src = typeof link.source === 'object' ? link.source : gData.nodes.find(n => n.id === link.source);
-                    return src ? getColorForLabel(src.label) : '#ffffff';
+                    return src ? getColorForLabel(src) : '#ffffff';
                 })
                 .linkDirectionalParticleSpeed(d => 0.005)
                 .onNodeClick(node => inspectNode(node))
