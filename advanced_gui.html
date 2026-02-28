@@ -274,7 +274,7 @@
 
     <script>
         let Graph;
-        let graphData = { nodes: [], links: [] };
+        let graphData = "INJECT_GRAPH_DATA_HERE";
 
         // Configuration mapping
         const typeConfig = {
@@ -307,17 +307,24 @@
         }
 
         // Initialize
-        fetch('graph_data_3d.json')
-            .then(res => res.json())
-            .then(data => {
-                graphData = data;
-                initGraph(data);
-                buildMockLLMTree(); // In real app, fetch llm_reasoning.json
-            })
-            .catch(err => {
-                console.error('Failed to load graph data:', err);
-                document.getElementById('llm-tree').innerHTML = '<div class="text-cyber-danger text-xs p-2 bg-red-900 bg-opacity-20 rounded border border-red-800">No graph data found. Generate it from the backend.</div>';
-            });
+        if (graphData !== "INJECT_GRAPH_DATA_HERE") {
+            // Data was injected directly from Python backend
+            initGraph(graphData);
+            buildMockLLMTree();
+        } else {
+            // Fallback for direct HTML viewing
+            fetch('graph_data_3d.json')
+                .then(res => res.json())
+                .then(data => {
+                    graphData = data;
+                    initGraph(data);
+                    buildMockLLMTree();
+                })
+                .catch(err => {
+                    console.error('Failed to load graph data:', err);
+                    document.getElementById('llm-tree').innerHTML = '<div class="text-cyber-danger text-xs p-2 bg-red-900 bg-opacity-20 rounded border border-red-800">No graph data found. Generate it from the backend.</div>';
+                });
+        }
 
         function initGraph(gData) {
             document.getElementById('stat-nodes').textContent = gData.nodes.length;

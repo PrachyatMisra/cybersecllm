@@ -187,8 +187,8 @@ def show_dashboard():
                 html_content = f.read()
 
             html_content = html_content.replace(
-                "const graphData = {};",
-                f"const graphData = {json.dumps(graph_data)};"
+                '"INJECT_GRAPH_DATA_HERE"',
+                json.dumps(graph_data)
             )
             
             components.html(html_content, height=750, scrolling=False)
@@ -341,8 +341,21 @@ def show_attack_paths():
         return
     
     st.markdown("""
-    Analyze potential attack paths between entry points and high-value targets.
-    """)
+    <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 8px; padding: 15px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+        <h4 style="margin-top: 0; color: #60A5FA; display: flex; align-items: center; gap: 8px; font-weight: 600;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+            Advanced Dijkstra Analytics
+        </h4>
+        <p style="color: #D1D5DB; font-size: 0.9rem; margin-bottom: 10px; line-height: 1.5;">
+            This module leverages Neo4j's native <strong>Dijkstra shortest path algorithms</strong> to calculate the most probable attack vectors an adversary might take to compromise critical assets.
+        </p>
+        <ul style="color: #9CA3AF; font-size: 0.85rem; margin-bottom: 0; padding-left: 20px; line-height: 1.6;">
+            <li><strong style="color: #60A5FA;">Entry Point:</strong> The adversary's initial foothold (e.g., 'Phishing' or 'T1190').</li>
+            <li><strong style="color: #EF4444;">Target Asset:</strong> The ultimate objective (e.g., 'Data Exfiltration' or a specific highly-privileged node).</li>
+            <li><strong style="color: #A78BFA;">Max Depth:</strong> Restricts graph hop traversal to prevent exponential computational bloat on dense graphs.</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
     
@@ -382,9 +395,21 @@ def show_rag_interface():
         return
     
     st.markdown("""
-    Ask questions about cybersecurity threats using natural language.
-    The system will retrieve relevant context from the knowledge graph.
-    """)
+    <div style="background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 8px; padding: 15px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+        <h4 style="margin-top: 0; color: #A78BFA; display: flex; align-items: center; gap: 8px; font-weight: 600;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+            Omni-RAG LLM Engine (Llama3)
+        </h4>
+        <p style="color: #D1D5DB; font-size: 0.9rem; margin-bottom: 10px; line-height: 1.5;">
+            The Omni-RAG Core allows you to interrogate the entire Knowledge Graph using natural language. It orchestrates a local <strong>Llama3</strong> context window to ensure absolute data privacy and zero API leakage.
+        </p>
+        <ul style="color: #9CA3AF; font-size: 0.85rem; margin-bottom: 0; padding-left: 20px; line-height: 1.6;">
+            <li><strong style="color: #10B981;">Hybrid (Vector + Graph):</strong> The most powerful mode. Fuses semantic similarity search with raw Cypher topology queries to guarantee extreme factual accuracy.</li>
+            <li><strong style="color: #3B82F6;">Graph Only:</strong> Strictly queries relationships physically connected to keywords in your prompt. Lightning fast.</li>
+            <li><strong style="color: #F59E0B;">Vector Only:</strong> Uses pure semantic embeddings. Ideal for finding abstract concepts without exact keyword matches.</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
     
     query = st.text_area(
         "Your Question",
