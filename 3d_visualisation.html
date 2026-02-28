@@ -1,0 +1,196 @@
+<!-- 3d_visualization.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cybersecurity Knowledge Graph 3D</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0e27;
+            color: #fff;
+            overflow: hidden;
+        }
+        
+        #graph-container {
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        #controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.8);
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 1000;
+        }
+        
+        h1 {
+            margin: 0 0 15px 0;
+            font-size: 1.5em;
+        }
+        
+        .control-group {
+            margin: 10px 0;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+        
+        input[type="range"] {
+            width: 200px;
+        }
+        
+        #stats {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.8);
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 0.9em;
+        }
+        
+        #node-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.9);
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 300px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <h1>🛡️ Cyber Knowledge Graph</h1>
+        <div class="control-group">
+            <label>Node Size: <span id="node-size-value">5</span></label>
+            <input type="range" id="node-size" min="1" max="15" value="5">
+        </div>
+        <div class="control-group">
+            <label>Link Distance: <span id="link-distance-value">150</span></label>
+            <input type="range" id="link-distance" min="50" max="500" value="150">
+        </div>
+        <div class="control-group">
+            <button id="reset-camera">Reset Camera</button>
+        </div>
+    </div>
+    
+    <div id="stats">
+        <div>Nodes: <span id="node-count">0</span></div>
+        <div>Links: <span id="link-count">0</span></div>
+        <div>FPS: <span id="fps">60</span></div>
+    </div>
+    
+    <div id="node-info">
+        <h3 id="node-name"></h3>
+        <div id="node-details"></div>
+    </div>
+    
+    <div id="graph-container"></div>
+    
+    <script src="//unpkg.com/3d-force-graph"></script>
+    <script>
+        // Load graph data
+        fetch('graph_data_3d.json')
+            .then(res => res.json())
+            .then(data => {
+                initGraph(data);
+            })
+            .catch(err => {
+                console.error('Failed to load graph data:', err);
+                alert('Please generate graph data first using the Streamlit app');
+            });
+        
+        function initGraph(graphData) {
+            // Update stats
+            document.getElementById('node-count').textContent = graphData.nodes.length;
+            document.getElementById('link-count').textContent = graphData.links.length;
+            
+            // Initialize 3D force graph
+            const Graph = ForceGraph3D()
+                (document.getElementById('graph-container'))
+                .graphData(graphData)
+                .nodeLabel('name')
+                .nodeColor(node => node.color || '#4A90E2')
+                .nodeVal(node => node.size || 5)
+                .linkColor(() => 'rgba(255,255,255,0.2)')
+                .linkWidth(0.5)
+                .linkDirectionalParticles(2)
+                .linkDirectionalParticleWidth(1)
+                .onNodeClick(node => {
+                    showNodeInfo(node);
+                })
+                .onBackgroundClick(() => {
+                    hideNodeInfo();
+                });
+            
+            // Camera distance
+            Graph.cameraPosition({ z: 1000 });
+            
+            // Controls
+            document.getElementById('node-size').addEventListener('input', (e) => {
+                const size = e.target.value;
+                document.getElementById('node-size-value').textContent = size;
+                Graph.nodeVal(node => node.size * size / 5);
+            });
+            
+            document.getElementById('link-distance').addEventListener('input', (e) => {
+                const distance = e.target.value;
+                document.getElementById('link-distance-value').textContent = distance;
+                Graph.d3Force('link').distance(distance);
+                Graph.numDimensions(3); // Trigger refresh
+            });
+            
+            document.getElementById('reset-camera').addEventListener('click', () => {
+                Graph.cameraPosition({ x: 0, y: 0, z: 1000 }, { x: 0, y: 0, z: 0 }, 1000);
+            });
+            
+            // FPS counter
+            let lastTime = performance.now();
+            let frames = 0;
+            
+            function updateFPS() {
+                frames++;
+                const currentTime = performance.now();
+                if (currentTime >= lastTime + 1000) {
+                    document.getElementById('fps').textContent = Math.round(frames * 1000 / (currentTime - lastTime));
+                    frames = 0;
+                    lastTime = currentTime;
+                }
+                requestAnimationFrame(updateFPS);
+            }
+            updateFPS();
+        }
+        
+        function showNodeInfo(node) {
+            const infoPanel = document.getElementById('node-info');
+            document.getElementById('node-name').textContent = node.name;
+            
+            let details = `<div><strong>Type:</strong> ${node.label}</div>`;
+            details += `<div><strong>ID:</strong> ${node.id}</div>`;
+            
+            if (node.description) {
+                details += `<div><strong>Description:</strong> ${node.description.substring(0, 200)}...</div>`;
+            }
+            
+            document.getElementById('node-details').innerHTML = details;
+            infoPanel.style.display = 'block';
+        }
+        
+        function hideNodeInfo() {
+            document.getElementById('node-info').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
